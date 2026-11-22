@@ -1,0 +1,7 @@
+# Documentos personales (otro proyecto, con nombres de terceros)
+*.docx
+*.pdf
+~$*
+
+# Configuración local
+.claude/

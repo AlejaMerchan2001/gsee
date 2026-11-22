@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>G-SEE - Productos</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="css/styles.css?v=2" />
+</head>
+<body>
+
+<header>
+  <div class="nav-container">
+    <a href="index.html" class="logo">
+      <div class="logo-icon">👓</div>
+      <span>G-SEE</span>
+    </a>
+    <nav>
+      <ul>
+        <li><a href="index.html">Inicio</a></li>
+        <li><a href="productos.html">Productos</a></li>
+        <li><a href="simulador.html">Simulador</a></li>
+        <li><a href="nosotros.html">Nosotros</a></li>
+        <li><a href="contacto.html">Contacto</a></li>
+      </ul>
+    </nav>
+    <div class="nav-actions">
+      <div class="user-info" id="user-info">
+        Invitado
+      </div>
+      <button class="btn btn-outline" id="login-btn">Login</button>
+      <button class="btn btn-primary" id="cart-btn">
+        🛒
+        <span>Carrito</span>
+        <span class="badge" id="cart-count">0</span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<main>
+
+  <section>
+    <div class="section-header">
+      <div>
+        <h1 class="section-title">Catálogo de productos</h1>
+        <p class="section-subtitle">
+          Explora nuestra galería tipo Pinterest y añade tus accesorios favoritos al carrito.
+        </p>
+      </div>
+    </div>
+
+    <div class="filters" id="filters">
+      <button class="filter-pill active" data-category="all">
+        Todo
+      </button>
+      <button class="filter-pill" data-category="cordones">
+        Cordones
+      </button>
+      <button class="filter-pill" data-category="estuches">
+        Estuches
+      </button>
+      <button class="filter-pill" data-category="limpieza">
+        Limpieza
+      </button>
+      <button class="filter-pill" data-category="filtros">
+        Filtros azul
+      </button>
+      <button class="filter-pill" data-category="otros">
+        Otros accesorios
+      </button>
+    </div>
+
+    <div class="product-grid" id="product-grid"></div>
+  </section>
+
+</main>
+
+<footer>
+  © <span id="year"></span> G-SEE. Tienda online de óptica y accesorios para gafas.
+</footer>
+
+
+  <!-- MODAL LOGIN -->
+  <div class="modal-backdrop" id="login-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <h2>Iniciar sesión</h2>
+        <button class="close-btn" data-close-modal="login-modal">×</button>
+      </div>
+      <form id="login-form">
+        <div class="form-group">
+          <label for="login-email">Correo electrónico</label>
+          <input
+            type="email"
+            id="login-email"
+            placeholder="tucorreo@ejemplo.com"
+            required
+          />
+        </div>
+        <div class="form-group">
+          <label for="login-password">Contraseña</label>
+          <input
+            type="password"
+            id="login-password"
+            placeholder="Mínimo 4 caracteres"
+            required
+          />
+          <div class="form-helper">
+            Este login es solo de demostración (se guarda en localStorage).
+          </div>
+        </div>
+        <div class="error-text" id="login-error"></div>
+        <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 0.4rem;">
+          Entrar
+        </button>
+        <div class="modal-footer">
+          <span>¿Aún sin cuenta? Usa cualquier correo para probar </span>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL CARRITO -->
+  <div class="modal-backdrop" id="cart-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <h2>Tu carrito</h2>
+        <button class="close-btn" data-close-modal="cart-modal">×</button>
+      </div>
+      <div class="cart-items" id="cart-items"></div>
+      <div class="cart-summary">
+        <span>Total:</span>
+        <strong id="cart-total">$0</strong>
+      </div>
+      <div class="modal-footer">
+        <span>Precios y productos son solo de ejemplo.</span>
+        <button class="btn btn-primary" id="checkout-btn">
+          Comprar ahora
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL CHECKOUT -->
+  <div class="modal-backdrop" id="checkout-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <h2>Finalizar compra</h2>
+        <button class="close-btn" data-close-modal="checkout-modal">×</button>
+      </div>
+
+      <form id="checkout-form">
+        <div class="form-group">
+          <label>Nombre completo</label>
+          <input type="text" id="chk-name" required placeholder="Ej. Juan Pérez" />
+        </div>
+
+        <div class="form-group">
+          <label>Dirección</label>
+          <input type="text" id="chk-address" required placeholder="Calle, número, apto..." />
+        </div>
+
+        <div class="form-group">
+          <label>Teléfono</label>
+          <input type="text" id="chk-phone" required placeholder="300 000 0000" />
+        </div>
+
+        <div class="form-group">
+          <label>Método de pago</label>
+          <select id="chk-payment" required>
+            <option value="contraentrega">Pago contraentrega</option>
+            <option value="nequi">Nequi</option>
+            <option value="bancolombia">Transferencia Bancolombia</option>
+          </select>
+        </div>
+
+        <hr style="margin: 0.5rem 0">
+
+        <div class="cart-summary">
+          <span>Total a pagar:</span>
+          <strong id="chk-total">$0</strong>
+        </div>
+
+        <button type="submit" class="btn btn-primary" style="width: 100%">Confirmar compra</button>
+        <div class="form-helper">Este checkout es demostrativo (no genera pago real).</div>
+      </form>
+    </div>
+  </div>
+
+  <!-- TOAST -->
+  <div class="toast" id="toast">
+    <span class="toast-dot"></span>
+    <span id="toast-message">Mensaje</span>
+  </div>
+
+<script src="js/app.js?v=2"></script>
+</body>
+</html>
