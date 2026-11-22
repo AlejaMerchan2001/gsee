@@ -603,8 +603,8 @@ main {
 }
 
 .lens {
-  flex: 0 0 64px;
-  height: 64px;
+  flex: 0 0 76px;
+  height: 76px;
   border-radius: 50%;
   border: 3px solid transparent;
   background: #f2d3bd;
@@ -620,6 +620,14 @@ main {
 
 .lens.active {
   border-color: var(--accent);
+}
+
+.lens:first-child {
+  margin-left: auto;
+}
+
+.lens:last-child {
+  margin-right: auto;
 }
 
 .camera-bar {

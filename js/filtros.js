@@ -15,161 +15,104 @@
   };
 
   // Los dibujos usan una cara de 200 unidades de ancho, con (0, 0) entre los ojos.
+  // "y" baja o sube la montura respecto a los ojos; las imágenes están en monturas.js.
   const FILTERS = [
-    { name: "Clásica", shape: "square", frame: "#16181d", width: 8, lens: "#b9e6ff22", burst: "✨" },
-    { name: "Redonda", shape: "round", frame: "#b08d45", width: 4, lens: "#ffffff18", burst: "✨" },
-    { name: "Aviador", shape: "aviator", frame: "#d4af37", width: 4, lens: ["#17251fee", "#62805f99"], burst: "😎" },
-    { name: "Color", shape: "square", frame: "#f6873d", width: 9, lens: ["#ff4f9a99", "#ffd36a55"], burst: "🎉" },
-    { name: "Ojo de gato", shape: "cateye", frame: "#8c1d40", width: 8, lens: "#ffc4d522", burst: "💋" },
-    { name: "Luz azul", shape: "square", frame: "#285e61", width: 6, lens: ["#4c6fff66", "#8be9ff22"], burst: "💎" },
-    { name: "Corazones", shape: "heart", frame: "#e8336d", width: 7, lens: ["#ff2f7caa", "#ffb3d177"], burst: "💖" },
-    { name: "Estrellas", shape: "star", frame: "#f5b700", width: 7, lens: ["#7b2ff7aa", "#f107a377"], burst: "⭐" },
-    { name: "Gatito", shape: "cateye", frame: "#3b2b35", width: 5, lens: "#ffffff11", extra: "cat", burst: "🐾" },
-    { name: "Flores", shape: "round", frame: "#d98aa6", width: 4, lens: "#ffd6e822", extra: "flowers", burst: "🌸" },
+    { id: "cereza", name: "Cereza floral", width: 184, y: 5, hinge: -8, charms: true, burst: "🍀" },
+    { id: "carey", name: "Carey rosado", width: 188, y: 5, hinge: -6, burst: "✨" },
+    { id: "miel", name: "Miel y crema", width: 188, y: 5, hinge: -6, burst: "🤎" },
+    { id: "ambar", name: "Carey ámbar", width: 188, y: 5, hinge: -7, burst: "⭐" },
+    { id: "negra", name: "Negra ovalada", width: 188, y: 5, hinge: -8, burst: "🖤" },
   ];
+  for (const f of FILTERS) {
+    const art = window.MONTURAS[f.id];
+    f.height = (f.width * art.height) / art.width;
+    f.front = new Image();
+    f.front.src = art.front;
+    f.temple = new Image();
+    f.temple.src = art.temple;
+  }
 
-  // Silueta del lente derecho; el izquierdo es su reflejo.
-  const lensPath = (shape) => {
-    const p = new Path2D();
-    if (shape === "round") {
-      p.arc(45, 4, 31, 0, Math.PI * 2);
-    } else if (shape === "square") {
-      p.roundRect(12, -22, 70, 50, [10, 12, 22, 20]);
-    } else if (shape === "aviator") {
-      p.moveTo(14, -17);
-      p.bezierCurveTo(35, -24, 68, -24, 82, -16);
-      p.bezierCurveTo(90, 22, 68, 40, 47, 38);
-      p.bezierCurveTo(26, 36, 10, 14, 14, -17);
-    } else if (shape === "cateye") {
-      p.moveTo(13, -12);
-      p.bezierCurveTo(34, -24, 66, -22, 90, -32);
-      p.bezierCurveTo(86, 14, 72, 28, 46, 28);
-      p.bezierCurveTo(22, 28, 10, 12, 13, -12);
-    } else if (shape === "heart") {
-      p.moveTo(47, -15);
-      p.bezierCurveTo(53, -35, 88, -36, 87, -6);
-      p.bezierCurveTo(86, 15, 62, 28, 47, 42);
-      p.bezierCurveTo(32, 28, 8, 15, 7, -6);
-      p.bezierCurveTo(6, -36, 41, -35, 47, -15);
-    } else if (shape === "star") {
-      for (let i = 0; i < 10; i++) {
-        const r = i % 2 ? 26 : 45;
-        const a = (i * Math.PI) / 5 - Math.PI / 2;
-        p.lineTo(48 + r * Math.cos(a), 4 + r * Math.sin(a));
-      }
-    }
-    p.closePath();
-    return p;
-  };
-  FILTERS.forEach((f) => (f.path = lensPath(f.shape)));
-
-  const drawCatEars = (c) => {
-    for (const side of [-1, 1]) {
-      c.save();
-      c.scale(side, 1);
-      c.fillStyle = "#3b2b35";
-      c.beginPath();
-      c.moveTo(22, -88);
-      c.quadraticCurveTo(50, -145, 86, -165);
-      c.quadraticCurveTo(105, -108, 94, -52);
-      c.quadraticCurveTo(66, -86, 22, -88);
-      c.fill();
-      c.fillStyle = "#f49ab8";
-      c.beginPath();
-      c.moveTo(48, -92);
-      c.quadraticCurveTo(60, -120, 80, -140);
-      c.quadraticCurveTo(92, -105, 85, -74);
-      c.quadraticCurveTo(70, -90, 48, -92);
-      c.fill();
-      c.restore();
-    }
+  const drawFront = (c, f) => {
+    c.drawImage(f.front, -f.width / 2, f.y - f.height / 2, f.width, f.height);
   };
 
-  const drawFlowers = (c) => {
-    const colors = ["#f48fb1", "#fff1a8", "#b39ddb", "#ff8a80", "#b39ddb", "#fff1a8", "#f48fb1"];
-    colors.forEach((color, i) => {
-      const x = (i - 3) * 31;
-      const y = -98 + x * x * 0.0048;
-      const r = 20 - Math.abs(i - 3) * 1.5;
-      c.fillStyle = color;
-      for (let k = 0; k < 6; k++) {
-        const a = (k * Math.PI) / 3;
-        c.beginPath();
-        c.arc(x + r * 0.65 * Math.cos(a), y + r * 0.65 * Math.sin(a), r * 0.55, 0, Math.PI * 2);
-        c.fill();
-      }
-      c.fillStyle = "#e6a11c";
-      c.beginPath();
-      c.arc(x, y, r * 0.4, 0, Math.PI * 2);
-      c.fill();
-    });
-  };
-
-  const drawCatNose = (c, x, y) => {
+  // La patilla es una tira con la textura de la foto, de la bisagra hacia la oreja.
+  const drawTemple = (c, f, side, ear) => {
+    const x = side * (f.width / 2 - 4);
+    const y = f.y + f.hinge;
+    if ((ear.x - x) * side <= 2) return; // queda oculta al girar la cara
+    const dx = ear.x - x;
+    const dy = ear.y - 6 - y;
     c.save();
     c.translate(x, y);
-    c.fillStyle = "#e86f98";
-    c.beginPath();
-    c.ellipse(0, 0, 15, 10, 0, 0, Math.PI * 2);
-    c.fill();
-    c.strokeStyle = "#3b2b35";
-    c.lineWidth = 2.5;
-    c.beginPath();
-    for (const side of [-1, 1]) {
-      for (const i of [-1, 0, 1]) {
-        c.moveTo(side * 27, 8 + i * 6);
-        c.quadraticCurveTo(side * 58, 4 + i * 9, side * 88, 10 + i * 16);
-      }
-    }
-    c.stroke();
+    c.rotate(Math.atan2(dy, dx));
+    if (side < 0) c.scale(1, -1);
+    c.drawImage(f.temple, 0, -3.5, Math.hypot(dx, dy), 7);
     c.restore();
   };
 
-  const drawFilter = (c, f, nose) => {
-    if (f.extra === "cat") {
-      drawCatEars(c);
-      drawCatNose(c, nose.x, nose.y);
-    }
-    if (f.extra === "flowers") drawFlowers(c);
-
-    for (const side of [-1, 1]) {
-      c.save();
-      c.scale(side, 1);
-      let fill = f.lens;
-      if (Array.isArray(fill)) {
-        fill = c.createLinearGradient(0, -28, 0, 38);
-        fill.addColorStop(0, f.lens[0]);
-        fill.addColorStop(1, f.lens[1]);
-      }
-      c.fillStyle = fill;
-      c.fill(f.path);
-      c.save();
-      c.clip(f.path);
-      c.fillStyle = "#ffffff30"; // brillo del cristal
+  // Dijes plateados: aro, cadena con nota y estrella con trébol.
+  const drawCharms = (c, swing) => {
+    const silver = (width, path) => {
       c.beginPath();
-      c.moveTo(34, -50);
-      c.lineTo(50, -50);
-      c.lineTo(22, 50);
-      c.lineTo(6, 50);
-      c.fill();
-      c.restore();
-      c.strokeStyle = f.frame;
-      c.lineWidth = f.width;
-      c.lineJoin = "round";
-      c.stroke(f.path);
-      c.restore();
-    }
+      path();
+      c.lineWidth = width;
+      c.strokeStyle = "#62666e";
+      c.stroke();
+      c.lineWidth = width * 0.55;
+      c.strokeStyle = "#e9edf2";
+      c.stroke();
+    };
+    const ring = (x, y, r, width = 1.8) => silver(width, () => c.arc(x, y, r, 0, Math.PI * 2));
 
-    c.strokeStyle = f.frame;
-    c.lineWidth = f.width;
-    c.beginPath();
-    c.moveTo(-15, -6);
-    c.quadraticCurveTo(0, -16, 15, -6);
-    if (f.shape === "aviator") {
-      c.moveTo(-22, -19);
-      c.lineTo(22, -19);
+    c.save();
+    c.lineJoin = c.lineCap = "round";
+    c.rotate(swing * 0.5);
+    ring(0, 6, 7, 3);
+
+    c.save(); // cadena con nota musical
+    c.translate(-3, 13);
+    c.rotate(0.12 + swing * 0.5);
+    for (let y = 2; y < 23; y += 3.5) ring(0, y, 1.8, 1.3);
+    silver(3, () => {
+      c.moveTo(-3, 39);
+      c.lineTo(-3, 26);
+      c.lineTo(7, 25);
+      c.lineTo(7, 38);
+    });
+    for (const [x, y] of [[-6, 40], [4, 39]]) {
+      silver(2.2, () => c.ellipse(x, y, 3.5, 2.5, -0.4, 0, Math.PI * 2));
     }
-    c.stroke();
+    c.restore();
+
+    c.save(); // estrella con trébol
+    c.translate(4, 12);
+    c.rotate(-0.25 + swing * 0.7);
+    ring(0, 2, 2.5);
+    silver(2.6, () => {
+      for (let i = 0; i < 10; i++) {
+        const r = i % 2 ? 5 : 9.5;
+        const a = (i * Math.PI) / 5 - Math.PI / 2;
+        c.lineTo(r * Math.cos(a), 14 + r * Math.sin(a));
+      }
+      c.closePath();
+    });
+    ring(0, 25, 2.2);
+    c.translate(0, 35);
+    c.fillStyle = "#d5dae1";
+    for (let i = 0; i < 4; i++) {
+      c.beginPath();
+      c.moveTo(0, 0);
+      c.bezierCurveTo(-8, -4, -5, -10, 0, -7);
+      c.bezierCurveTo(5, -10, 8, -4, 0, 0);
+      c.fill();
+      c.lineWidth = 1;
+      c.strokeStyle = "#62666e";
+      c.stroke();
+      c.rotate(Math.PI / 2);
+    }
+    c.restore();
+    c.restore();
   };
 
   // Convierte los puntos de la cara en una base 3D proyectada sobre la imagen.
@@ -215,27 +158,40 @@
       size,
       leftEar: toFace(leftEar),
       rightEar: toFace(rightEar),
-      nose: toFace(at(1)),
       mouth: at(13),
-      mouthOpen: Math.hypot(lip.x, lip.y, lip.z) / size > 30,
+      mouthOpen: Math.hypot(lip.x, lip.y, lip.z) > Math.hypot(height.x, height.y, height.z) * 0.13,
     };
+  };
+
+  // Los dijes cuelgan con la gravedad: no giran con la cara y se balancean al moverla.
+  const pendulum = { x: null, angle: 0, speed: 0 };
+  const hangCharms = (pose, f) => {
+    const [a, b, c, d, e, g] = pose.matrix;
+    const localX = -f.width / 2 + 9;
+    const localY = f.y + f.height * 0.2;
+    const x = a * localX + c * localY + e;
+    const y = b * localX + d * localY + g;
+    const moved = pendulum.x === null ? 0 : (x - pendulum.x) / pose.size;
+    pendulum.x = x;
+    pendulum.speed = (pendulum.speed - pendulum.angle * 0.08 + moved * 0.008) * 0.9;
+    pendulum.angle = Math.max(-0.8, Math.min(0.8, pendulum.angle + pendulum.speed));
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.scale(pose.size, pose.size);
+    drawCharms(ctx, pendulum.angle);
+    ctx.restore();
   };
 
   const drawFace = (pose, f) => {
     ctx.save();
     ctx.transform(...pose.matrix);
-    // La patilla del lado que queda oculto al girar no se dibuja.
-    ctx.strokeStyle = f.frame;
-    ctx.lineWidth = f.width;
-    ctx.lineCap = "round";
-    for (const [side, ear] of [[-1, pose.leftEar], [1, pose.rightEar]]) {
-      if (ear.x * side <= 84) continue;
-      ctx.beginPath();
-      ctx.moveTo(side * 82, -12);
-      ctx.lineTo(ear.x, ear.y - 6);
-      ctx.stroke();
-    }
-    drawFilter(ctx, f, pose.nose);
+    drawTemple(ctx, f, -1, pose.leftEar);
+    drawTemple(ctx, f, 1, pose.rightEar);
+    ctx.restore();
+    if (f.charms) hangCharms(pose, f); // detrás del frente, como en la foto
+    ctx.save();
+    ctx.transform(...pose.matrix);
+    drawFront(ctx, f);
     ctx.restore();
   };
 
@@ -428,13 +384,22 @@
     const icon = document.createElement("canvas");
     icon.width = icon.height = 128;
     const c = icon.getContext("2d");
-    c.translate(64, f.extra ? 80 : 64);
-    c.scale(0.54, 0.54);
-    drawFilter(c, f, { x: 0, y: 48 });
+    c.translate(64, f.charms ? 52 : 64);
+    c.scale(0.6, 0.6);
+    f.front.decode().then(() => {
+      if (f.charms) {
+        c.save();
+        c.translate(-f.width / 2 + 9, f.y + f.height * 0.2);
+        drawCharms(c, 0);
+        c.restore();
+      }
+      drawFront(c, f);
+    }).catch((err) => console.error("No se pudo cargar la montura:", f.id, err));
     button.append(icon);
     button.addEventListener("click", () => {
       current = f;
       particles = [];
+      pendulum.x = null;
       $("sim-name").textContent = f.name;
       $("sim-lenses").querySelectorAll(".lens").forEach((b) => {
         b.classList.toggle("active", b === button);
